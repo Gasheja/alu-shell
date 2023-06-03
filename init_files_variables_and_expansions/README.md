@@ -1,1 +1,1 @@
-This is shell init project
+Shell, init files, variables and expansions
