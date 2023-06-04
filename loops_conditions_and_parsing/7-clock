@@ -9,12 +9,12 @@ while [ $count -lt 70 ]; do
     minutes=$((minutes + 1))
     count=$((count + 1))
 
-    if [ $minutes -eq 60 ]; then
+    if [ $minutes -gt 59 ]; then
         minutes=0
         hours=$((hours + 1))
     fi
 
-    if [ $hours -eq 13 ]; then
-        hours=1
+    if [ $hours -gt 12 ]; then
+        hours=0
     fi
-done
+done | head -n 70
