@@ -2,12 +2,14 @@
 # script
 hours=0
 minutes=1
+count=0
 
-while [[ $hours -le 12 ]]; do
-    while [[ $minutes -le 59 ]]; do
+while [[ $hours -le 12 && $count -lt 70 ]]; do
+    while [[ $minutes -le 59 && $count -lt 70 ]]; do
         printf "%02d:%02d\n" $hours $minutes
         minutes=$((minutes + 1))
+        count=$((count + 1))
     done
     minutes=0
     hours=$((hours + 1))
-done | head -n 70
+done
