@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 # script
-hours=0
-minutes=1
 count=0
 
-while [[ $hours -le 12 && $count -lt 70 ]]; do
-    while [[ $minutes -le 59 && $count -lt 70 ]]; do
-        printf "%02d:%02d\n" $hours $minutes
-        minutes=$((minutes + 1))
-        count=$((count + 1))
+for hours in {0..12}; do
+    for minutes in {1..59}; do
+        if [[ $count -lt 70 ]]; then
+            printf "%02d:%02d\n" $hours $minutes
+            count=$((count + 1))
+        else
+            break 2
+        fi
     done
-    minutes=0
-    hours=$((hours + 1))
 done
