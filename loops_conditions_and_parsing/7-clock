@@ -1,19 +1,13 @@
 #!/usr/bin/env bash
 # script
-count=0
-while [ $count -lt 70 ]; do
-    hour=$((count / 60))
-    minute=$((count % 60))
+hours=0
+minutes=1
 
-    if [ $hour -eq 0 ]; then
-        echo "Hour: $hour"
-    fi
-
-    if [ $minute -eq 0 ]; then
-        echo $hour
-    else
-        echo $minute
-    fi
-
-    ((count++))
+while [[ $hours -le 12 ]]; do
+    while [[ $minutes -le 59 ]]; do
+        printf "%02d:%02d\n" $hours $minutes
+        minutes=$((minutes + 1))
+    done
+    minutes=0
+    hours=$((hours + 1))
 done | head -n 70
