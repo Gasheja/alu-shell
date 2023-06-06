@@ -1,26 +1,4 @@
 #!/usr/bin/env bash
-# script
-LOG_FILE="/var/log/nginx/access.log"
-TEMP_FILE=$(mktemp)
+# Dig the data
 
-# Check if the log file exists
-if [ ! -f "$LOG_FILE" ]; then
-    echo "Log file $LOG_FILE not found."
-    exit 1
-fi
-
-# Extract relevant information from the log file using awk
-awk '{count[$1" "$9]++} END {for (key in count) print count[key], key}' "$LOG_FILE" > "$TEMP_FILE"
-
-# Check if the log file is empty
-if [ ! -s "$TEMP_FILE" ]; then
-    echo "Log file $LOG_FILE is empty."
-    rm "$TEMP_FILE"
-    exit 1
-fi
-
-# Sort the output in reverse numeric order and display the result
-sort -rn "$TEMP_FILE" | head -n 10
-
-# Clean up temporary file
-rm "$TEMP_FILE"
+awk '{print $1,$9}' apache-access.log | sort | uniq -c | sort -r
