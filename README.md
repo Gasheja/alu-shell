@@ -1,1 +1,1 @@
-This is my alu-shell project
+Shell, processes and signals
