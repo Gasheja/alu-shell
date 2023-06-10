@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# bash script that print mi PID
+pid=$BASHPID
+echo "The PID of this script is: $pid"
