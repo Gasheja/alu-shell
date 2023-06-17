@@ -18,6 +18,7 @@ for pid_dir in /proc/[0-9]*; do
     ppid=$(awk '/^PPid:/ {print $2}' "$pid_dir/status")
     command=$(get_command "$pid")
     parent_command=$(get_command "$ppid")
-    printf "%-10s %5s %-10s %s\n" "$user" "$pid" "$parent_command" "$command"
+    printf "%-10s %-5s %-10s %s\n" "$user" "$pid" "$parent_command" "$command"
 done
+
 
