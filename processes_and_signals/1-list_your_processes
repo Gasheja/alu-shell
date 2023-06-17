@@ -1,28 +1,23 @@
 #!/usr/bin/env bash
-
 # Script: 1-list_your_processes
-# Description: Displays a list of currently running processes
-#              with process hierarchy using the /proc filesystem
 
-# Iterate over all directories in /proc that are numeric (representing process IDs)
-for pid in /proc/[0-9]*/; do
-    pid=${pid%*/}  # Remove the trailing slash
-    pid=${pid##*/} # Extract the process ID from the path
+get_command() {
+    local pid=$1
+    local cmd_path="/proc/$pid/cmdline"
 
-    # Read process information from the status file
-    if [[ -r "/proc/$pid/status" ]]; then
-        user=$(grep -oP '^Uid:\s+\K(\S+)' "/proc/$pid/status")
-        tty=$(readlink -f "/proc/$pid/fd/0")
-
-        # Read process command from the cmdline file
-        if [[ -r "/proc/$pid/cmdline" ]]; then
-            cmd=$(tr '\0' ' ' < "/proc/$pid/cmdline")
-            cmd=${cmd%% *} # Extract the first argument as the command
-        fi
-
-        # Print the process information
-        printf "%-10s %5s %4s %4s %6s %6s %4s %8s %5s %s\n" \
-            "$user" "$pid" "" "" "" "" "$tty" "" "" "$cmd"
+    if [[ -r "$cmd_path" ]]; then
+        local command=$(tr -s '\0' ' ' < "$cmd_path")
+        echo "${command%% *}"
     fi
+}
+
+for pid_dir in /proc/[0-9]*; do
+    pid=$(basename "$pid_dir")
+    user=$(awk '/^Uid:/ {print $2}' "$pid_dir/status")
+    tty=$(readlink "/proc/$pid/fd/0")
+    ppid=$(awk '/^PPid:/ {print $2}' "$pid_dir/status")
+    command=$(get_command "$pid")
+    parent_command=$(get_command "$ppid")
+    printf "%-10s %5s %-10s %s\n" "$user" "$pid" "$parent_command" "$command"
 done
 
