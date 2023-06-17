@@ -1,26 +1,7 @@
 #!/usr/bin/env bash
-# Display a list of currently running processes
+# This script displays list of currently running processes
+# Must show all processes, for all users, including those which might not have a TTY
+# Display a user-oriented format
+# Show process hierarchy
 
-printf "%-10s %-6s %-4s %-4s %-6s %-6s %-4s %-4s %-5s %s\n" "USER" "PID" "%CPU" "%MEM" "VSZ" "RSS" "TTY" "STAT" "START" "COMMAND"
-
-for pid_dir in /proc/[0-9]*; do
-    pid=$(basename "$pid_dir")
-    stat_file="$pid_dir/stat"
-    status_file="$pid_dir/status"
-
-    if [[ -r "$stat_file" && -r "$status_file" ]]; then
-        uid=$(awk '/^Uid:/ {print $2}' "$status_file")
-        ppid=$(awk '{print $4}' "$stat_file")
-        tty_nr=$(awk '{print $7}' "$stat_file")
-        state=$(awk '{print $3}' "$stat_file")
-        start_time=$(awk '{print $22}' "$stat_file")
-        cpu_usage=$(awk '{print $14 + $15}' "$stat_file")
-        vsz=$(awk '/^VmSize:/ {print $2}' "$status_file")
-        rss=$(awk '/^VmRSS:/ {print $2}' "$status_file")
-        command=$(tr -d '\0' < "/proc/$pid/cmdline")
-
-        printf "%-10s %-6s %-4s %-4s %-6s %-6s %-4s %-4s %-5s %s\n" "$uid" "$pid" "$cpu_usage" "" "$vsz" "$rss" "$tty_nr" "$state" "$start_time" "$command"
-    fi
-done
-
-
+ps -a -x -u -f
