@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Script: 1-list_your_processes
+# Description: Displays a list of currently running processes
+#              with process hierarchy using the /proc filesystem
+
 # Iterate over all directories in /proc that are numeric (representing process IDs)
 for pid in /proc/[0-9]*/; do
     pid=${pid%*/}  # Remove the trailing slash
