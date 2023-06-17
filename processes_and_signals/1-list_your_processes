@@ -1,18 +1,7 @@
 #!/usr/bin/env bash
-# Get the current script's PID
-script_pid=$$
+# This script displays list of currently running processes
+# Must show all processes, for all users, including those which might not have a TTY
+# Display a user-oriented format
+# Show process hierarchy
 
-# Find all running processes containing the word "bash" and extract their PID and process name
-processes=$(pgrep -fl bash)
-
-# Loop through each process and display its PID and process name if it is running
-while read -r pid process_name; do
-    # Check if the process is running by examining its status in /proc
-    if [[ -d "/proc/$pid" ]]; then
-        echo "$pid $process_name"
-    fi
-done <<< "$processes"
-
-# Display the PID and process name of the current script
-echo "$script_pid $0"
-
+ps -a -x -u -f
