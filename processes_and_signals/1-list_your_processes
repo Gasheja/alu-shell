@@ -1,24 +1,33 @@
 #!/usr/bin/env bash
-# Script: 1-list_your_processes
+# Display a list of currently running processes
 
-get_command() {
-    local pid=$1
-    local cmd_path="/proc/$pid/cmdline"
-
-    if [[ -r "$cmd_path" ]]; then
-        local command=$(tr -s '\0' ' ' < "$cmd_path")
-        echo "${command%% *}"
-    fi
-}
+printf "%-10s %-5s %-10s %s\n" "USER" "PID" "%CPU" "%MEM" "VSZ" "RSS" "TTY" "STAT" "START" "TIME" "COMMAND"
 
 for pid_dir in /proc/[0-9]*; do
     pid=$(basename "$pid_dir")
-    user=$(awk '/^Uid:/ {print $2}' "$pid_dir/status")
-    tty=$(readlink "/proc/$pid/fd/0")
-    ppid=$(awk '/^PPid:/ {print $2}' "$pid_dir/status")
-    command=$(get_command "$pid")
-    parent_command=$(get_command "$ppid")
-    printf "%-10s %-5s %-10s %s\n" "$user" "$pid" "$parent_command" "$command"
-done
+    stat_file="$pid_dir/stat"
+    status_file="$pid_dir/status"
 
+    pid_info=$(awk '{print $1, $2, $3, $4, $5, $6, $7, $8}' "$stat_file")
+    read pid comm state ppid pgrp session tty_nr tpgid <<EOF
+$pid_info
+EOF
+
+    uid=$(awk '/^Uid:/ {print $2}' "$status_file")
+    utime=$(awk '/^utime/ {print $2}' "$stat_file")
+    stime=$(awk '/^stime/ {print $2}' "$stat_file")
+    uptime=$(awk '{print $1}' /proc/uptime)
+    cpu_usage=$((100 * (utime + stime) / (uptime * $(getconf CLK_TCK))))
+
+    vsz=$(awk '/^VmSize:/ {print $2}' "$status_file")
+    rss=$(awk '/^VmRSS:/ {print $2}' "$status_file")
+
+    tty_nr=$(awk '{print $7}' "$stat_file")
+    state=$(awk '{print $3}' "$stat_file")
+    start_time=$(awk '{print $22}' "$stat_file")
+
+    command=$(tr -d '\0' < "/proc/$pid/cmdline")
+
+    printf "%-10s %-5s %5s %5s %7s %6s %-6s %-4s %5s %5s %s\n" "$uid" "$pid" "$cpu_usage" "" "$vsz" "$rss" "$tty_nr" "$state" "$start_time" "" "$command"
+done
 
